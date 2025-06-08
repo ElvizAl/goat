@@ -8742,6 +8742,10 @@ export namespace Prisma {
     amountPaid: number | null
     paymentDate: Date | null
     paymentStatus: $Enums.PaymentStatus | null
+    paymentMethod: $Enums.PaymentType | null
+    proofUrl: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type PaymentMaxAggregateOutputType = {
@@ -8750,6 +8754,10 @@ export namespace Prisma {
     amountPaid: number | null
     paymentDate: Date | null
     paymentStatus: $Enums.PaymentStatus | null
+    paymentMethod: $Enums.PaymentType | null
+    proofUrl: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type PaymentCountAggregateOutputType = {
@@ -8758,6 +8766,10 @@ export namespace Prisma {
     amountPaid: number
     paymentDate: number
     paymentStatus: number
+    paymentMethod: number
+    proofUrl: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -8776,6 +8788,10 @@ export namespace Prisma {
     amountPaid?: true
     paymentDate?: true
     paymentStatus?: true
+    paymentMethod?: true
+    proofUrl?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type PaymentMaxAggregateInputType = {
@@ -8784,6 +8800,10 @@ export namespace Prisma {
     amountPaid?: true
     paymentDate?: true
     paymentStatus?: true
+    paymentMethod?: true
+    proofUrl?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type PaymentCountAggregateInputType = {
@@ -8792,6 +8812,10 @@ export namespace Prisma {
     amountPaid?: true
     paymentDate?: true
     paymentStatus?: true
+    paymentMethod?: true
+    proofUrl?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -8887,6 +8911,10 @@ export namespace Prisma {
     amountPaid: number
     paymentDate: Date
     paymentStatus: $Enums.PaymentStatus
+    paymentMethod: $Enums.PaymentType
+    proofUrl: string | null
+    createdAt: Date
+    updatedAt: Date
     _count: PaymentCountAggregateOutputType | null
     _avg: PaymentAvgAggregateOutputType | null
     _sum: PaymentSumAggregateOutputType | null
@@ -8914,6 +8942,10 @@ export namespace Prisma {
     amountPaid?: boolean
     paymentDate?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
+    proofUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payment"]>
 
@@ -8923,6 +8955,10 @@ export namespace Prisma {
     amountPaid?: boolean
     paymentDate?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
+    proofUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payment"]>
 
@@ -8932,6 +8968,10 @@ export namespace Prisma {
     amountPaid?: boolean
     paymentDate?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
+    proofUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payment"]>
 
@@ -8941,9 +8981,13 @@ export namespace Prisma {
     amountPaid?: boolean
     paymentDate?: boolean
     paymentStatus?: boolean
+    paymentMethod?: boolean
+    proofUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "amountPaid" | "paymentDate" | "paymentStatus", ExtArgs["result"]["payment"]>
+  export type PaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "amountPaid" | "paymentDate" | "paymentStatus" | "paymentMethod" | "proofUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["payment"]>
   export type PaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
   }
@@ -8965,6 +9009,10 @@ export namespace Prisma {
       amountPaid: number
       paymentDate: Date
       paymentStatus: $Enums.PaymentStatus
+      paymentMethod: $Enums.PaymentType
+      proofUrl: string | null
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["payment"]>
     composites: {}
   }
@@ -9394,6 +9442,10 @@ export namespace Prisma {
     readonly amountPaid: FieldRef<"Payment", 'Float'>
     readonly paymentDate: FieldRef<"Payment", 'DateTime'>
     readonly paymentStatus: FieldRef<"Payment", 'PaymentStatus'>
+    readonly paymentMethod: FieldRef<"Payment", 'PaymentType'>
+    readonly proofUrl: FieldRef<"Payment", 'String'>
+    readonly createdAt: FieldRef<"Payment", 'DateTime'>
+    readonly updatedAt: FieldRef<"Payment", 'DateTime'>
   }
     
 
@@ -10999,7 +11051,11 @@ export namespace Prisma {
     orderId: 'orderId',
     amountPaid: 'amountPaid',
     paymentDate: 'paymentDate',
-    paymentStatus: 'paymentStatus'
+    paymentStatus: 'paymentStatus',
+    paymentMethod: 'paymentMethod',
+    proofUrl: 'proofUrl',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
@@ -11623,6 +11679,10 @@ export namespace Prisma {
     amountPaid?: FloatFilter<"Payment"> | number
     paymentDate?: DateTimeFilter<"Payment"> | Date | string
     paymentStatus?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFilter<"Payment"> | $Enums.PaymentType
+    proofUrl?: StringNullableFilter<"Payment"> | string | null
+    createdAt?: DateTimeFilter<"Payment"> | Date | string
+    updatedAt?: DateTimeFilter<"Payment"> | Date | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
   }
 
@@ -11632,6 +11692,10 @@ export namespace Prisma {
     amountPaid?: SortOrder
     paymentDate?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
+    proofUrl?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     order?: OrderOrderByWithRelationInput
   }
 
@@ -11644,6 +11708,10 @@ export namespace Prisma {
     amountPaid?: FloatFilter<"Payment"> | number
     paymentDate?: DateTimeFilter<"Payment"> | Date | string
     paymentStatus?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFilter<"Payment"> | $Enums.PaymentType
+    proofUrl?: StringNullableFilter<"Payment"> | string | null
+    createdAt?: DateTimeFilter<"Payment"> | Date | string
+    updatedAt?: DateTimeFilter<"Payment"> | Date | string
     order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
   }, "id">
 
@@ -11653,6 +11721,10 @@ export namespace Prisma {
     amountPaid?: SortOrder
     paymentDate?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
+    proofUrl?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: PaymentCountOrderByAggregateInput
     _avg?: PaymentAvgOrderByAggregateInput
     _max?: PaymentMaxOrderByAggregateInput
@@ -11669,6 +11741,10 @@ export namespace Prisma {
     amountPaid?: FloatWithAggregatesFilter<"Payment"> | number
     paymentDate?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
     paymentStatus?: EnumPaymentStatusWithAggregatesFilter<"Payment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeWithAggregatesFilter<"Payment"> | $Enums.PaymentType
+    proofUrl?: StringNullableWithAggregatesFilter<"Payment"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Payment"> | Date | string
   }
 
   export type AnalyticsWhereInput = {
@@ -12229,7 +12305,11 @@ export namespace Prisma {
     id?: string
     amountPaid: number
     paymentDate?: Date | string
-    paymentStatus: $Enums.PaymentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentType
+    proofUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     order: OrderCreateNestedOneWithoutPaymentsInput
   }
 
@@ -12238,7 +12318,11 @@ export namespace Prisma {
     orderId: string
     amountPaid: number
     paymentDate?: Date | string
-    paymentStatus: $Enums.PaymentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentType
+    proofUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PaymentUpdateInput = {
@@ -12246,6 +12330,10 @@ export namespace Prisma {
     amountPaid?: FloatFieldUpdateOperationsInput | number
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     order?: OrderUpdateOneRequiredWithoutPaymentsNestedInput
   }
 
@@ -12255,6 +12343,10 @@ export namespace Prisma {
     amountPaid?: FloatFieldUpdateOperationsInput | number
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PaymentCreateManyInput = {
@@ -12262,7 +12354,11 @@ export namespace Prisma {
     orderId: string
     amountPaid: number
     paymentDate?: Date | string
-    paymentStatus: $Enums.PaymentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentType
+    proofUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PaymentUpdateManyMutationInput = {
@@ -12270,6 +12366,10 @@ export namespace Prisma {
     amountPaid?: FloatFieldUpdateOperationsInput | number
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PaymentUncheckedUpdateManyInput = {
@@ -12278,6 +12378,10 @@ export namespace Prisma {
     amountPaid?: FloatFieldUpdateOperationsInput | number
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AnalyticsCreateInput = {
@@ -12881,6 +12985,10 @@ export namespace Prisma {
     amountPaid?: SortOrder
     paymentDate?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
+    proofUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type PaymentAvgOrderByAggregateInput = {
@@ -12893,6 +13001,10 @@ export namespace Prisma {
     amountPaid?: SortOrder
     paymentDate?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
+    proofUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type PaymentMinOrderByAggregateInput = {
@@ -12901,6 +13013,10 @@ export namespace Prisma {
     amountPaid?: SortOrder
     paymentDate?: SortOrder
     paymentStatus?: SortOrder
+    paymentMethod?: SortOrder
+    proofUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type PaymentSumOrderByAggregateInput = {
@@ -14193,14 +14309,22 @@ export namespace Prisma {
     id?: string
     amountPaid: number
     paymentDate?: Date | string
-    paymentStatus: $Enums.PaymentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentType
+    proofUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PaymentUncheckedCreateWithoutOrderInput = {
     id?: string
     amountPaid: number
     paymentDate?: Date | string
-    paymentStatus: $Enums.PaymentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentType
+    proofUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PaymentCreateOrConnectWithoutOrderInput = {
@@ -14316,6 +14440,10 @@ export namespace Prisma {
     amountPaid?: FloatFilter<"Payment"> | number
     paymentDate?: DateTimeFilter<"Payment"> | Date | string
     paymentStatus?: EnumPaymentStatusFilter<"Payment"> | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFilter<"Payment"> | $Enums.PaymentType
+    proofUrl?: StringNullableFilter<"Payment"> | string | null
+    createdAt?: DateTimeFilter<"Payment"> | Date | string
+    updatedAt?: DateTimeFilter<"Payment"> | Date | string
   }
 
   export type UserUpsertWithoutOrdersInput = {
@@ -14945,7 +15073,11 @@ export namespace Prisma {
     id?: string
     amountPaid: number
     paymentDate?: Date | string
-    paymentStatus: $Enums.PaymentStatus
+    paymentStatus?: $Enums.PaymentStatus
+    paymentMethod?: $Enums.PaymentType
+    proofUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type OrderItemUpdateWithoutOrderInput = {
@@ -14983,6 +15115,10 @@ export namespace Prisma {
     amountPaid?: FloatFieldUpdateOperationsInput | number
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PaymentUncheckedUpdateWithoutOrderInput = {
@@ -14990,6 +15126,10 @@ export namespace Prisma {
     amountPaid?: FloatFieldUpdateOperationsInput | number
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PaymentUncheckedUpdateManyWithoutOrderInput = {
@@ -14997,6 +15137,10 @@ export namespace Prisma {
     amountPaid?: FloatFieldUpdateOperationsInput | number
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentStatus?: EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
+    paymentMethod?: EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
+    proofUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

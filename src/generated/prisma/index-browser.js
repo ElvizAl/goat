@@ -190,7 +190,11 @@ exports.Prisma.PaymentScalarFieldEnum = {
   orderId: 'orderId',
   amountPaid: 'amountPaid',
   paymentDate: 'paymentDate',
-  paymentStatus: 'paymentStatus'
+  paymentStatus: 'paymentStatus',
+  paymentMethod: 'paymentMethod',
+  proofUrl: 'proofUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AnalyticsScalarFieldEnum = {

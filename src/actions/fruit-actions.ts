@@ -12,106 +12,119 @@ import {
 import { deleteImage } from "@/actions/image-actions"
 import { revalidatePath } from "next/cache"
 
+// Fungsi untuk membuat data buah baru
 export async function createFruit(data: CreateFruitInput) {
   try {
+    // Memvalidasi data yang diterima
     const validatedData = createFruitSchema.parse(data)
 
+    // Menyimpan data buah baru ke dalam database
     const fruit = await prisma.fruit.create({
       data: validatedData,
     })
 
-    revalidatePath("/fruits")
+    // Revalidasi path agar halaman terkait di-refresh
+    revalidatePath("dashboard/buah")
     revalidatePath("/dashboard")
     return { success: true, data: fruit }
   } catch (error) {
     console.error("Error creating fruit:", error)
-    return { error: "Failed to create fruit" }
+    return { error: "Gagal membuat buah" }
   }
 }
 
+// Fungsi untuk memperbarui data buah
 export async function updateFruit(data: UpdateFruitInput) {
   try {
+    // Memvalidasi data yang diterima
     const validatedData = updateFruitSchema.parse(data)
     const { id, ...updateData } = validatedData
 
-    // Get the current fruit to check if image is being changed
+    // Mendapatkan data buah yang ada untuk memeriksa jika ada perubahan gambar
     const currentFruit = await prisma.fruit.findUnique({
       where: { id },
       select: { image: true },
     })
 
-    // If image is being changed and there was an old image, delete it
+    // Jika gambar berubah dan ada gambar lama, hapus gambar lama
     if (currentFruit?.image && updateData.image !== currentFruit.image) {
       try {
         await deleteImage(currentFruit.image)
       } catch (error) {
-        console.warn("Failed to delete old image:", error)
+        console.warn("Gagal menghapus gambar lama:", error)
       }
     }
 
+    // Memperbarui data buah dalam database
     const fruit = await prisma.fruit.update({
       where: { id },
       data: updateData,
     })
 
-    revalidatePath("/fruits")
+    // Revalidasi path agar halaman terkait di-refresh
+    revalidatePath("dashboard/buah")
     revalidatePath("/dashboard")
-    revalidatePath(`/fruits/${id}`)
+    revalidatePath(`dashboard/buah/${id}`)
     return { success: true, data: fruit }
   } catch (error) {
     console.error("Error updating fruit:", error)
-    return { error: "Failed to update fruit" }
+    return { error: "Gagal memperbarui buah" }
   }
 }
 
+// Fungsi untuk menghapus buah berdasarkan ID
 export async function deleteFruit(id: string) {
   try {
-    // Get the fruit to check if it has an image
+    // Mendapatkan data buah untuk memeriksa jika ada gambar
     const fruit = await prisma.fruit.findUnique({
       where: { id },
       select: { image: true },
     })
 
-    // Check if fruit is used in any orders
+    // Memeriksa apakah buah digunakan dalam pesanan
     const orderItemCount = await prisma.orderItem.count({
       where: { fruitId: id },
     })
 
+    // Jika buah sudah dipesan, tidak dapat dihapus
     if (orderItemCount > 0) {
-      return { error: "Cannot delete fruit that has been ordered" }
+      return { error: "Tidak dapat menghapus buah yang sudah dipesan" }
     }
 
-    // Delete the fruit from database
+    // Menghapus data buah dari database
     await prisma.fruit.delete({
       where: { id },
     })
 
-    // Delete the image if it exists
+    // Menghapus gambar jika ada
     if (fruit?.image) {
       try {
         await deleteImage(fruit.image)
       } catch (error) {
-        console.warn("Failed to delete fruit image:", error)
+        console.warn("Gagal menghapus gambar buah:", error)
       }
     }
 
+    // Revalidasi path agar halaman terkait di-refresh
     revalidatePath("/fruits")
     revalidatePath("/dashboard")
     return { success: true }
   } catch (error) {
     console.error("Error deleting fruit:", error)
-    return { error: "Failed to delete fruit" }
+    return { error: "Gagal menghapus buah" }
   }
 }
 
+// Fungsi untuk mencari buah berdasarkan parameter pencarian
 export async function searchFruits(params: FruitSearchInput) {
   try {
+    // Memvalidasi parameter pencarian
     const validatedParams = fruitSearchSchema.parse(params)
     const { query, sortBy, sortOrder, page, limit, inStock } = validatedParams
 
     const skip = (page - 1) * limit
 
-    // Build where clause
+    // Membuat klausa WHERE untuk pencarian
     const where: any = {}
 
     if (query) {
@@ -127,7 +140,7 @@ export async function searchFruits(params: FruitSearchInput) {
       }
     }
 
-    // Build order by clause
+    // Membuat klausa ORDER BY untuk pengurutan data
     const orderBy: any = {}
     orderBy[sortBy] = sortOrder
 
@@ -163,10 +176,11 @@ export async function searchFruits(params: FruitSearchInput) {
     }
   } catch (error) {
     console.error("Error searching fruits:", error)
-    return { error: "Failed to search fruits" }
+    return { error: "Gagal mencari buah" }
   }
 }
 
+// Fungsi untuk mendapatkan semua data buah
 export async function getFruits() {
   try {
     const fruits = await prisma.fruit.findMany({
@@ -184,10 +198,11 @@ export async function getFruits() {
     return { success: true, data: fruits }
   } catch (error) {
     console.error("Error fetching fruits:", error)
-    return { error: "Failed to fetch fruits" }
+    return { error: "Gagal mengambil buah" }
   }
 }
 
+// Fungsi untuk mendapatkan data buah berdasarkan ID
 export async function getFruitById(id: string) {
   try {
     const fruit = await prisma.fruit.findUnique({
@@ -211,16 +226,17 @@ export async function getFruitById(id: string) {
     })
 
     if (!fruit) {
-      return { error: "Fruit not found" }
+      return { error: "Buah tidak ditemukan" }
     }
 
     return { success: true, data: fruit }
   } catch (error) {
     console.error("Error fetching fruit:", error)
-    return { error: "Failed to fetch fruit" }
+    return { error: "Gagal mengambil data buah" }
   }
 }
 
+// Fungsi untuk mendapatkan buah yang tersedia di stok
 export async function getFruitsInStock() {
   try {
     const fruits = await prisma.fruit.findMany({
@@ -235,10 +251,11 @@ export async function getFruitsInStock() {
     return { success: true, data: fruits }
   } catch (error) {
     console.error("Error fetching fruits in stock:", error)
-    return { error: "Failed to fetch fruits in stock" }
+    return { error: "Gagal mengambil buah yang ada di stok" }
   }
 }
 
+// Fungsi untuk mendapatkan statistik buah
 export async function getFruitStats() {
   try {
     const [totalFruits, inStockFruits, lowStockFruits, outOfStockFruits, totalValue] = await Promise.all([
@@ -286,10 +303,11 @@ export async function getFruitStats() {
     }
   } catch (error) {
     console.error("Error fetching fruit stats:", error)
-    return { error: "Failed to fetch fruit stats" }
+    return { error: "Gagal mengambil statistik buah" }
   }
 }
 
+// Fungsi untuk mendapatkan buah yang paling populer berdasarkan penjualan
 export async function getPopularFruits(limit = 6) {
   try {
     const popularFruits = await prisma.orderItem.groupBy({
@@ -321,6 +339,6 @@ export async function getPopularFruits(limit = 6) {
     return { success: true, data: fruitsWithDetails.filter(Boolean) }
   } catch (error) {
     console.error("Error fetching popular fruits:", error)
-    return { error: "Failed to fetch popular fruits" }
+    return { error: "Gagal mengambil buah populer" }
   }
 }

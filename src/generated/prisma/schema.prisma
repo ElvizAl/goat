@@ -120,7 +120,11 @@ model Payment {
   order         Order         @relation(fields: [orderId], references: [id]) // Relasi ke model Order
   amountPaid    Float // Jumlah yang dibayar
   paymentDate   DateTime      @default(now()) // Tanggal pembayaran
-  paymentStatus PaymentStatus // Status pembayaran: pending, completed, failed
+  paymentStatus PaymentStatus @default(PENDING) // Status pembayaran: pending, completed, failed
+  paymentMethod PaymentType   @default(CASH) // Metode pembayaran
+  proofUrl      String?
+  createdAt     DateTime      @default(now()) // Tanggal pembuatan record
+  updatedAt     DateTime      @updatedAt // Tanggal update record
 }
 
 enum PaymentStatus {

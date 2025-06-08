@@ -8,13 +8,13 @@ import { Plus } from "lucide-react"
 import Link from "next/link"
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     status?: string
     payment?: string
     sortBy?: string
     sortOrder?: string
     page?: string
-  }
+  }>
 }
 
 export default async function OrdersPage({ searchParams }: PageProps) {
@@ -30,14 +30,15 @@ export default async function OrdersPage({ searchParams }: PageProps) {
           <p className="text-gray-600">Manage customer orders and payments</p>
         </div>
         <Button asChild>
-          <Link href="/orders/new">
+          <Link href="/dashboard/orders/new">
             <Plus className="h-4 w-4 mr-2" />
             New Order
           </Link>
         </Button>
       </div>
 
-      <OrderStats />
+      {/* Pass orders data to OrderStats */}
+      {ordersResult.success && <OrderStats orders={ordersResult.data} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">

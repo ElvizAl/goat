@@ -1,12 +1,7 @@
 "use server"
 
 import { prisma } from "@/db/prisma"
-import {
-  createOrderSchema,
-  updateOrderSchema,
-  type CreateOrderInput,
-  type UpdateOrderInput,
-} from "@/validasi/validasi"
+import { createOrderSchema, updateOrderSchema, type CreateOrderInput, type UpdateOrderInput } from "@/validasi/validasi"
 import { revalidatePath } from "next/cache"
 
 export async function createOrder(data: CreateOrderInput) {
@@ -76,6 +71,17 @@ export async function createOrder(data: CreateOrderInput) {
           },
         })
       }
+
+      // Automatically create payment record
+      await tx.payment.create({
+        data: {
+          orderId: newOrder.id,
+          amountPaid: total,
+          paymentStatus: "PENDING",
+          paymentMethod: validatedData.payment,
+          paymentDate: new Date(),
+        },
+      })
 
       return newOrder
     })
@@ -155,6 +161,12 @@ export async function cancelOrder(id: string) {
         })
       }
 
+      // Update related payments to FAILED (not CANCELLED)
+      await tx.payment.updateMany({
+        where: { orderId: id },
+        data: { paymentStatus: "FAILED" },
+      })
+
       // Update order status
       return await tx.order.update({
         where: { id },
@@ -186,6 +198,7 @@ export async function getOrders(userId?: string) {
             },
           },
         },
+        payments: true,
         _count: {
           select: {
             orderItems: true,
@@ -229,5 +242,76 @@ export async function getOrderById(id: string) {
   } catch (error) {
     console.error("Error fetching order:", error)
     return { error: "Failed to fetch order" }
+  }
+}
+
+export async function getOrderSummary() {
+  try {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+
+    const [totalOrders, todayOrders, thisMonthOrders, statusCounts] = await Promise.all([
+      // Total orders
+      prisma.order.aggregate({
+        _count: { id: true },
+        _sum: { total: true },
+      }),
+
+      // Today's orders
+      prisma.order.aggregate({
+        where: {
+          createdAt: {
+            gte: today,
+            lt: tomorrow,
+          },
+        },
+        _count: { id: true },
+        _sum: { total: true },
+      }),
+
+      // This month's orders
+      prisma.order.aggregate({
+        where: {
+          createdAt: {
+            gte: thisMonth,
+          },
+        },
+        _count: { id: true },
+        _sum: { total: true },
+      }),
+
+      // Orders by status
+      prisma.order.groupBy({
+        by: ["status"],
+        _count: { id: true },
+      }),
+    ])
+
+    return {
+      success: true,
+      data: {
+        totalCount: totalOrders._count.id,
+        totalAmount: totalOrders._sum.total || 0,
+        todayCount: todayOrders._count.id,
+        todayAmount: todayOrders._sum.total || 0,
+        thisMonthCount: thisMonthOrders._count.id,
+        thisMonthAmount: thisMonthOrders._sum.total || 0,
+        statusBreakdown: statusCounts.reduce(
+          (acc, item) => {
+            acc[item.status] = item._count.id
+            return acc
+          },
+          {} as Record<string, number>,
+        ),
+      },
+    }
+  } catch (error) {
+    console.error("Error fetching order summary:", error)
+    return { error: "Failed to fetch order summary" }
   }
 }

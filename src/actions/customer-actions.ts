@@ -455,6 +455,78 @@ export async function getCustomerSegments() {
   }
 }
 
+export async function getCustomerSummary() {
+  try {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+
+    const [totalCustomers, newCustomersThisMonth, activeCustomers, customerGrowth] = await Promise.all([
+      // Total customers
+      prisma.customer.count(),
+
+      // New customers this month
+      prisma.customer.count({
+        where: {
+          createdAt: {
+            gte: thisMonth,
+          },
+        },
+      }),
+
+      // Active customers (customers who made orders this month)
+      prisma.customer.count({
+        where: {
+          orders: {
+            some: {
+              createdAt: {
+                gte: thisMonth,
+              },
+            },
+          },
+        },
+      }),
+
+      // Customer growth (this month vs last month)
+      Promise.all([
+        prisma.customer.count({
+          where: {
+            createdAt: {
+              gte: thisMonth,
+            },
+          },
+        }),
+        prisma.customer.count({
+          where: {
+            createdAt: {
+              gte: lastMonth,
+              lt: thisMonth,
+            },
+          },
+        }),
+      ]),
+    ])
+
+    const [thisMonthCount, lastMonthCount] = customerGrowth
+    const growthPercentage = lastMonthCount > 0 ? ((thisMonthCount - lastMonthCount) / lastMonthCount) * 100 : 0
+
+    return {
+      success: true,
+      data: {
+        totalCustomers,
+        newCustomersThisMonth,
+        activeCustomers,
+        growthPercentage: Math.round(growthPercentage * 100) / 100,
+      },
+    }
+  } catch (error) {
+    console.error("Error fetching customer summary:", error)
+    return { error: "Failed to fetch customer summary" }
+  }
+}
+
 // Tambahkan fungsi ini setelah fungsi getCustomerSegments
 
 export async function createCustomerProfile(data: Omit<CreateCustomerInput, "userId">) {

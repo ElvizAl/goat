@@ -10,7 +10,8 @@ import { MoreHorizontal, Eye, X, CheckCircle } from "lucide-react"
 import { updateOrder, cancelOrder } from "@/actions/order-actions"
 import { useRouter } from "next/navigation"
 
-interface Order {
+// Interface yang sesuai dengan data dari database
+interface OrderFromDB {
   id: string
   orderNumber: string
   total: number
@@ -34,6 +35,12 @@ interface Order {
       image: string | null
     }
   }>
+  payments: Array<{
+    id: string
+    amountPaid: number
+    paymentStatus: string
+    paymentMethod: string
+  }>
   _count: {
     orderItems: number
     payments: number
@@ -41,7 +48,7 @@ interface Order {
 }
 
 interface OrderListProps {
-  orders: Order[]
+  orders: OrderFromDB[]
 }
 
 export function OrderList({ orders }: OrderListProps) {
@@ -102,6 +109,23 @@ export function OrderList({ orders }: OrderListProps) {
     }
   }
 
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(date))
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+    }).format(amount)
+  }
+
   return (
     <div className="space-y-4">
       {orders.length === 0 ? (
@@ -118,7 +142,7 @@ export function OrderList({ orders }: OrderListProps) {
                 <div>
                   <CardTitle className="text-lg">{order.orderNumber}</CardTitle>
                   <p className="text-sm text-gray-500">
-                    {order.customer.name} • {new Date(order.createdAt).toLocaleDateString()}
+                    {order.customer.name} • {formatDate(order.createdAt)}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -133,7 +157,7 @@ export function OrderList({ orders }: OrderListProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
-                        <Link href={`/orders/${order.id}`}>
+                        <Link href={`/dashboard/orders/${order.id}`}>
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </Link>
@@ -175,7 +199,7 @@ export function OrderList({ orders }: OrderListProps) {
                         <span>
                           {item.quantity}x {item.fruit.name}
                         </span>
-                        <span>Rp {item.subtotal.toLocaleString()}</span>
+                        <span>{formatCurrency(item.subtotal)}</span>
                       </div>
                     ))}
                     {order.orderItems.length > 3 && (
@@ -183,6 +207,35 @@ export function OrderList({ orders }: OrderListProps) {
                     )}
                   </div>
                 </div>
+
+                {/* Payment Status */}
+                {order.payments.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Payment Status</p>
+                    <div className="space-y-1">
+                      {order.payments.map((payment) => (
+                        <div key={payment.id} className="flex justify-between text-sm">
+                          <span className="flex items-center space-x-2">
+                            <Badge
+                              variant="outline"
+                              className={
+                                payment.paymentStatus === "COMPLETED"
+                                  ? "border-green-500 text-green-700"
+                                  : payment.paymentStatus === "PENDING"
+                                    ? "border-yellow-500 text-yellow-700"
+                                    : "border-red-500 text-red-700"
+                              }
+                            >
+                              {payment.paymentStatus}
+                            </Badge>
+                            <span>{payment.paymentMethod}</span>
+                          </span>
+                          <span>{formatCurrency(payment.amountPaid)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Order Summary */}
                 <div className="flex justify-between items-center pt-3 border-t">
@@ -192,7 +245,7 @@ export function OrderList({ orders }: OrderListProps) {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-500">Total</p>
-                    <p className="text-lg font-bold">Rp {order.total.toLocaleString()}</p>
+                    <p className="text-lg font-bold">{formatCurrency(order.total)}</p>
                   </div>
                 </div>
               </div>

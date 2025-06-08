@@ -38,7 +38,7 @@ export default function NewFruitPage() {
       })
 
       if (result.success) {
-        router.push("/fruits")
+        router.push("/dashboard/buah")
       } else {
         setError(result.error ?? "Something went wrong. Please try again.")
       }

@@ -115,12 +115,16 @@ model StockHistory {
 }
 
 model Payment {
-  id           String   @id @default(cuid())  // ID pembayaran
-  orderId      String   // ID pesanan yang terkait dengan pembayaran
-  order        Order    @relation(fields: [orderId], references: [id])  // Relasi ke model Order
-  amountPaid   Float    // Jumlah yang dibayar
-  paymentDate  DateTime @default(now())  // Tanggal pembayaran
-  paymentStatus PaymentStatus  // Status pembayaran: pending, completed, failed
+  id           String        @id @default(cuid())  // ID pembayaran
+  orderId      String        // ID pesanan yang terkait dengan pembayaran
+  order        Order         @relation(fields: [orderId], references: [id])  // Relasi ke model Order
+  amountPaid   Float         // Jumlah yang dibayar
+  paymentDate  DateTime      @default(now())  // Tanggal pembayaran
+  paymentStatus PaymentStatus @default(PENDING) // Status pembayaran: pending, completed, failed
+  paymentMethod PaymentType  @default(CASH)    // Metode pembayaran
+  proofUrl String?
+  createdAt    DateTime      @default(now())   // Tanggal pembuatan record
+  updatedAt    DateTime      @updatedAt        // Tanggal update record
 }
 
 enum PaymentStatus {
