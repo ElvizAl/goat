@@ -21,7 +21,7 @@ export default async function ProfilePage() {
           <div className="text-center">
             <h2 className="text-2xl font-semibold mb-2">Complete Your Profile</h2>
             <p className="text-gray-600 mb-6">
-              To start shopping and placing orders, please complete your customer profile first.
+              Untuk mulai berbelanja dan memesan, harap lengkapi profil pelanggan Anda terlebih dahulu.
             </p>
           </div>
           <CustomerProfileForm />

@@ -55,9 +55,9 @@ export function CustomerProfileForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Complete Your Profile</CardTitle>
+        <CardTitle>Selesaikan Profilmu</CardTitle>
         <CardDescription>
-          Please provide your customer information to start shopping and placing orders.
+          Harap berikan informasi pelanggan Anda untuk mulai berbelanja dan melakukan pemesanan.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -72,12 +72,12 @@ export function CustomerProfileForm() {
           {success && (
             <Alert className="bg-green-50 text-green-800 border-green-200">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription>Profile created successfully! Refreshing...</AlertDescription>
+              <AlertDescription>Profil berhasil dibuat! Sedang diperbarui...</AlertDescription>
             </Alert>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name *</Label>
+            <Label htmlFor="name">Nama Lengkap *</Label>
             <Input
               id="name"
               placeholder="Enter your full name"
@@ -99,7 +99,7 @@ export function CustomerProfileForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
+            <Label htmlFor="phone">No Telpon</Label>
             <Input
               id="phone"
               placeholder="Enter your phone number"
@@ -109,7 +109,7 @@ export function CustomerProfileForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="address">Alamat</Label>
             <Textarea
               id="address"
               placeholder="Enter your full address"
@@ -120,7 +120,7 @@ export function CustomerProfileForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading || success}>
-            {isLoading ? "Creating Profile..." : "Create Profile"}
+            {isLoading ? "Creating Profile..." : "Buat Profile"}
           </Button>
         </CardContent>
       </form>

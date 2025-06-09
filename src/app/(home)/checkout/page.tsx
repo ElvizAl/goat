@@ -128,7 +128,7 @@ export default function CheckoutPage() {
       return result.url
     } catch (error) {
       console.error("Upload error:", error)
-      setError("Gagal mengupload bukti transfer")
+      setError("Gagal mengupload bukti pembayaran")
       return null
     } finally {
       setUploadProgress(false)
@@ -168,7 +168,7 @@ ${itemList}
 *Metode Pembayaran:* ${payment}
 ${notes ? `*Catatan:* ${notes}` : ""}
 
-${payment === "TRANSFER" ? "Bukti transfer sudah diupload di sistem." : ""}
+${payment === "TRANSFER" || payment === "DIGITAL_WALLET" ? "Bukti pembayaran sudah diupload di sistem." : ""}
 
 Mohon segera diproses. Terima kasih!
     `.trim()
@@ -181,9 +181,9 @@ Mohon segera diproses. Terima kasih!
     e.preventDefault()
     if (!user || !customerData) return
 
-    // Validasi untuk transfer bank
-    if (payment === "TRANSFER" && !proofFile && !success) {
-      setError("Silakan upload bukti transfer terlebih dahulu")
+    // Validasi untuk transfer bank dan e-wallet
+    if ((payment === "TRANSFER" || payment === "DIGITAL_WALLET") && !proofFile && !success) {
+      setError("Silakan upload bukti pembayaran terlebih dahulu")
       return
     }
 
@@ -210,12 +210,12 @@ Mohon segera diproses. Terima kasih!
         setOrderData(result.data)
         let proofUrl = null
 
-        // Upload bukti transfer jika ada
-        if (proofFile && payment === "TRANSFER") {
+        // Upload bukti pembayaran jika ada
+        if (proofFile && (payment === "TRANSFER" || payment === "DIGITAL_WALLET")) {
           proofUrl = await uploadFile(proofFile)
 
           if (proofUrl) {
-            // Update payment record dengan bukti transfer
+            // Update payment record dengan bukti pembayaran
             const uploadResult = await uploadPaymentProof(result.data.id, proofUrl)
             if (!uploadResult.success) {
               console.error("Failed to save proof URL:", uploadResult.error)
@@ -257,8 +257,8 @@ Mohon segera diproses. Terima kasih!
             <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
             <h2 className="text-2xl font-bold mb-2">Pesanan Berhasil Dibuat!</h2>
             <p className="text-gray-500 mb-4">Pesanan Anda telah dibuat dan sedang diproses.</p>
-            {payment === "TRANSFER" && proofFile && (
-              <p className="text-green-600 mb-4">✓ Bukti transfer berhasil diupload</p>
+            {(payment === "TRANSFER" || payment === "DIGITAL_WALLET") && proofFile && (
+              <p className="text-green-600 mb-4">✓ Bukti pembayaran berhasil diupload</p>
             )}
             <p className="text-gray-500 mb-6">Silakan hubungi admin atau lihat detail pesanan Anda.</p>
             <div className="space-y-2">
@@ -439,10 +439,39 @@ Mohon segera diproses. Terima kasih!
                           className="object-contain"
                         />
                       </div>
-                      <p className="text-center text-sm">Scan QR code untuk membayar dengan {wallet}</p>
+                      <p className="text-center text-sm mb-4">Scan QR code untuk membayar dengan {wallet}</p>
                     </TabsContent>
                   ))}
                 </Tabs>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ewallet-proof">Upload Bukti Pembayaran E-Wallet *</Label>
+                  <div className="space-y-2">
+                    <Input
+                      id="ewallet-proof"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="flex-1"
+                      required
+                    />
+                    <p className="text-xs text-gray-500">
+                      Upload screenshot bukti pembayaran dari aplikasi e-wallet. Format: JPG, PNG, GIF. Maksimal 5MB
+                    </p>
+                    {proofFile && (
+                      <div className="flex items-center gap-2 p-2 bg-green-50 rounded-md">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="text-sm text-green-700">{proofFile.name} siap diupload</span>
+                      </div>
+                    )}
+                    {uploadProgress && (
+                      <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-md">
+                        <Upload className="h-4 w-4 text-blue-600 animate-pulse" />
+                        <span className="text-sm text-blue-700">Mengupload bukti pembayaran...</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

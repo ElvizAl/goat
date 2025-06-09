@@ -80,7 +80,7 @@ export function CustomerProfileDisplay({ customer }: CustomerProfileDisplayProps
               </div>
             </div>
             <Button asChild>
-              <Link href="/shop">Start Shopping</Link>
+              <Link href="/shop">Mulai Belanja</Link>
             </Button>
           </div>
         </CardHeader>
@@ -148,7 +148,7 @@ export function CustomerProfileDisplay({ customer }: CustomerProfileDisplayProps
             <div className="flex items-center space-x-2">
               <TrendingUp className="h-5 w-5 text-purple-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Average Order</p>
+                <p className="text-sm font-medium text-gray-600">Rata - Rata Order</p>
                 <p className="text-2xl font-bold">{formatCurrency(customer.stats.averageOrderValue)}</p>
               </div>
             </div>

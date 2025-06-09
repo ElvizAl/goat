@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { BarChart3, LayoutDashboard, Package, Settings, ShoppingCart, Users } from "lucide-react"
+import { BarChart3, LayoutDashboard, Package, Settings, ShoppingCart, Users, } from "lucide-react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -30,6 +30,11 @@ const navItems: NavItem[] = [
     icon: ShoppingCart,
   },
   {
+    title: "Pembayaran",
+    href: "/dashboard/payments",
+    icon: ShoppingCart,
+  },
+  {
     title: "Pelanggan",
     href: "/dashboard/pelanggan",
     icon: Users,
@@ -43,11 +48,6 @@ const navItems: NavItem[] = [
     title: "Pengguna",
     href: "/dashboard/users",
     icon: Users,
-  },
-  {
-    title: "Pengaturan",
-    href: "/dashboard/settings",
-    icon: Settings,
   },
 ]
 
