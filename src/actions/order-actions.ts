@@ -182,10 +182,80 @@ export async function cancelOrder(id: string) {
   }
 }
 
-export async function getOrders(userId?: string) {
+interface GetOrdersParams {
+  query?: string
+  status?: string
+  payment?: string
+  sortBy?: string
+  sortOrder?: string
+  page?: number
+  userId?: string
+}
+
+export async function getOrders(params?: GetOrdersParams) {
   try {
+    const {
+      query = "",
+      status = "",
+      payment = "",
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      page = 1,
+      userId,
+    } = params || {}
+
+    // Build where clause
+    const where: any = {}
+
+    // Filter by userId if provided
+    if (userId) {
+      where.userId = userId
+    }
+
+    // Search by order number or customer name
+    if (query) {
+      where.OR = [
+        {
+          orderNumber: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          customer: {
+            name: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        },
+      ]
+    }
+
+    // Filter by status
+    if (status && status !== "all") {
+      where.status = status
+    }
+
+    // Filter by payment method
+    if (payment && payment !== "all") {
+      where.payment = payment
+    }
+
+    // Build orderBy clause
+    const orderBy: any = {}
+    if (sortBy === "createdAt") {
+      orderBy.createdAt = sortOrder
+    } else if (sortBy === "total") {
+      orderBy.total = sortOrder
+    } else if (sortBy === "orderNumber") {
+      orderBy.orderNumber = sortOrder
+    } else {
+      orderBy.createdAt = "desc"
+    }
+
     const orders = await prisma.order.findMany({
-      where: userId ? { userId } : undefined,
+      where,
       include: {
         customer: true,
         user: {
@@ -206,7 +276,10 @@ export async function getOrders(userId?: string) {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy,
+      // Add pagination if needed
+      // skip: (page - 1) * 10,
+      // take: 10,
     })
 
     return { success: true, data: orders }

@@ -1,50 +1,43 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Filter } from "lucide-react"
-
-const SORT_OPTIONS = [
-  { value: "createdAt", label: "Date Added" },
-  { value: "name", label: "Name" },
-  { value: "price", label: "Price" },
-  { value: "stock", label: "Stock" },
-]
+import { Search, X } from "lucide-react"
 
 export function FruitFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const [query, setQuery] = useState(searchParams.get("query") || "")
-  const [inStock, setInStock] = useState(searchParams.get("inStock") === "true")
-  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "createdAt")
-  const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "desc")
+
+  // Real-time search with debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch()
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [query])
 
   const handleSearch = () => {
     const params = new URLSearchParams()
 
-    if (query) params.set("query", query)
-    if (inStock) params.set("inStock", "true")
-    if (sortBy) params.set("sortBy", sortBy)
-    if (sortOrder) params.set("sortOrder", sortOrder)
+    if (query.trim()) {
+      params.set("query", query.trim())
+    }
 
-    router.push(`/fruits?${params.toString()}`)
+    const url = params.toString() ? `/dashboard/buah?${params.toString()}` : "/dashboard/buah"
+    router.push(url)
   }
 
-  const clearFilters = () => {
+  const clearSearch = () => {
     setQuery("")
-    setInStock(false)
-    setSortBy("createdAt")
-    setSortOrder("desc")
-    router.push("/fruits")
+    router.push("/dashboard/buah")
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -57,76 +50,61 @@ export function FruitFilters() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Filter className="h-4 w-4" />
-          <span>Search & Filter</span>
+          <Search className="h-4 w-4" />
+          <span>Search Fruits</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Search */}
+      <CardContent className="space-y-4">
+        {/* Simple Search */}
         <div className="space-y-2">
-          <Label htmlFor="search">Search Fruits</Label>
-          <div className="flex space-x-2">
+          <Label htmlFor="search">Search by name</Label>
+          <div className="relative">
             <Input
               id="search"
-              placeholder="Search by fruit name..."
+              placeholder="Type fruit name..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
+              className="pr-8"
             />
-            <Button size="sm" onClick={handleSearch}>
-              <Search className="h-4 w-4" />
-            </Button>
+            {query && (
+              <Button variant="ghost" size="sm" className="absolute right-1 top-1 h-6 w-6 p-0" onClick={clearSearch}>
+                <X className="h-3 w-3" />
+              </Button>
+            )}
           </div>
+          {query && (
+            <p className="text-xs text-gray-500">
+              Searching for: <span className="font-medium">"{query}"</span>
+            </p>
+          )}
         </div>
 
-        {/* Stock Filter */}
-        <div className="space-y-3">
-          <Label>Stock Status</Label>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="inStock" checked={inStock} onCheckedChange={(checked) => setInStock(checked as boolean)} />
-            <Label htmlFor="inStock" className="text-sm">
-              In Stock Only
-            </Label>
-          </div>
-        </div>
-
-        {/* Sort */}
-        <div className="space-y-3">
-          <Label>Sort By</Label>
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={sortOrder} onValueChange={setSortOrder}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="desc">Descending</SelectItem>
-              <SelectItem value="asc">Ascending</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Actions */}
+        {/* Manual Search Button */}
         <div className="space-y-2">
-          <Button onClick={handleSearch} className="w-full">
-            Apply Filters
+          <Button onClick={handleSearch} className="w-full" size="sm">
+            <Search className="h-4 w-4 mr-2" />
+            Search Now
           </Button>
-          <Button onClick={clearFilters} variant="outline" className="w-full">
-            Clear All
-          </Button>
+          {query && (
+            <Button onClick={clearSearch} variant="outline" className="w-full" size="sm">
+              <X className="h-4 w-4 mr-2" />
+              Clear Search
+            </Button>
+          )}
+        </div>
+
+        {/* Search Info */}
+        <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+          <p>💡 Tips:</p>
+          <ul className="mt-1 space-y-1">
+            <li>• Type to search automatically</li>
+            <li>• Press Enter to search instantly</li>
+            <li>• Search is case-insensitive</li>
+          </ul>
         </div>
       </CardContent>
     </Card>
   )
 }
+

@@ -40,8 +40,8 @@ const navItems: NavItem[] = [
     icon: Users,
   },
   {
-    title: "Analitik",
-    href: "/dashboard/analytics",
+    title: "Laporan",
+    href: "/dashboard/reports",
     icon: BarChart3,
   },
   {

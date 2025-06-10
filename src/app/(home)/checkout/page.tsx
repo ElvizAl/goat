@@ -147,15 +147,17 @@ export default function CheckoutPage() {
   }
 
   const sendToWhatsApp = (orderData: any) => {
-    const phoneNumber = "6281234567890" // Ganti dengan nomor WhatsApp admin
+    const phoneNumber = "6283861332776" // Ganti dengan nomor WhatsApp admin
 
-    // Format item list
+    // Format item list dengan currency formatting yang konsisten
     const itemList = items
-      .map((item) => `• ${item.quantity}x ${item.name} - Rp ${(item.quantity * item.price).toLocaleString()}`)
+      .map((item) => `• ${item.quantity}x ${item.name} - Rp ${(item.quantity * item.price).toLocaleString("id-ID")}`)
       .join("\n")
 
-    const message = `
-Halo Admin, saya telah melakukan pemesanan:
+    // Format metode pembayaran
+    const paymentMethod = payment === "TRANSFER" ? "Transfer Bank" : payment === "DIGITAL_WALLET" ? "E-Wallet" : "Tunai"
+
+    const message = `Halo Admin, saya ingin menanyakan tentang pesanan:
 
 *Order Number:* ${orderData.orderNumber}
 *Order ID:* ${orderData.id}
@@ -164,14 +166,10 @@ Halo Admin, saya telah melakukan pemesanan:
 *Detail Pesanan:*
 ${itemList}
 
-*Total:* Rp ${total.toLocaleString()}
-*Metode Pembayaran:* ${payment}
-${notes ? `*Catatan:* ${notes}` : ""}
+*Total:* Rp ${total.toLocaleString("id-ID")}
+*Status:* PROCESSING
 
-${payment === "TRANSFER" || payment === "DIGITAL_WALLET" ? "Bukti pembayaran sudah diupload di sistem." : ""}
-
-Mohon segera diproses. Terima kasih!
-    `.trim()
+Mohon informasinya. Terima kasih!`
 
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
@@ -506,7 +504,7 @@ Mohon segera diproses. Terima kasih!
 
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span>Rp {total.toLocaleString()}</span>
+              <span>Rp {total.toLocaleString("id-ID")}</span>
             </div>
           </CardContent>
           <CardFooter>

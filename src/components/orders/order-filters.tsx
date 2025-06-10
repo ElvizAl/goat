@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Filter } from "lucide-react"
+import { Filter, Search, X } from "lucide-react"
+import { useDebounce } from "@/hooks/use-debounce"
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All Status" },
@@ -37,24 +39,44 @@ export function OrderFilters() {
   const [payment, setPayment] = useState(searchParams.get("payment") || "all")
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "createdAt")
   const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "desc")
+  const [search, setSearch] = useState(searchParams.get("query") || "")
+  const debouncedSearch = useDebounce(search, 500)
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (debouncedSearch) {
+      params.set("query", debouncedSearch)
+    } else {
+      params.delete("query")
+    }
+
+    router.push(`/dashboard/orders?${params.toString()}`)
+  }, [debouncedSearch, router, searchParams])
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams()
 
+    if (search) params.set("query", search)
     if (status && status !== "all") params.set("status", status)
     if (payment && payment !== "all") params.set("payment", payment)
     if (sortBy) params.set("sortBy", sortBy)
     if (sortOrder) params.set("sortOrder", sortOrder)
 
-    router.push(`/orders?${params.toString()}`)
+    router.push(`/dashboard/orders?${params.toString()}`)
   }
 
   const clearFilters = () => {
+    setSearch("")
     setStatus("all")
     setPayment("all")
     setSortBy("createdAt")
     setSortOrder("desc")
-    router.push("/orders")
+    router.push("/dashboard/orders")
+  }
+
+  const clearSearch = () => {
+    setSearch("")
   }
 
   return (
@@ -66,6 +88,31 @@ export function OrderFilters() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Search */}
+        <div className="space-y-2">
+          <Label>Search Orders</Label>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Order number, customer..."
+              className="pl-8 pr-10"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-2.5 top-2.5 text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-gray-500">Search by order number or customer name</p>
+        </div>
+
         {/* Status Filter */}
         <div className="space-y-2">
           <Label>Order Status</Label>

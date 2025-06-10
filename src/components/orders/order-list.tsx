@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Eye, X, CheckCircle } from "lucide-react"
+import { MoreHorizontal, Eye, X, CheckCircle, Search } from "lucide-react"
 import { updateOrder, cancelOrder } from "@/actions/order-actions"
-import { useRouter } from "next/navigation"
 
 // Interface yang sesuai dengan data dari database
 interface OrderFromDB {
@@ -126,133 +126,99 @@ export function OrderList({ orders }: OrderListProps) {
     }).format(amount)
   }
 
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-10 border rounded-lg bg-white">
+        <Search className="mx-auto h-10 w-10 text-gray-400 mb-3" />
+        <h3 className="text-lg font-medium">No orders found</h3>
+        <p className="text-gray-500 mt-1">Try adjusting your search or filter to find what you're looking for.</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-4">
-      {orders.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-gray-500">No orders found</p>
-          </CardContent>
-        </Card>
-      ) : (
-        orders.map((order) => (
-          <Card key={order.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">{order.orderNumber}</CardTitle>
-                  <p className="text-sm text-gray-500">
-                    {order.customer.name} • {formatDate(order.createdAt)}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
-                  <Badge className={getPaymentColor(order.payment)}>{order.payment}</Badge>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" disabled={updatingId === order.id}>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/orders/${order.id}`}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Link>
-                      </DropdownMenuItem>
-
-                      {order.status === "PROCESSING" && (
-                        <>
-                          <DropdownMenuItem
-                            onClick={() => handleStatusUpdate(order.id, "COMPLETED")}
-                            disabled={updatingId === order.id}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Mark Completed
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleCancel(order.id)}
-                            disabled={updatingId === order.id}
-                            className="text-red-600"
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Cancel Order
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent>
-              <div className="space-y-3">
-                {/* Order Items Preview */}
-                <div>
-                  <p className="text-sm font-medium mb-2">Items ({order._count.orderItems})</p>
-                  <div className="space-y-1">
-                    {order.orderItems.slice(0, 3).map((item) => (
-                      <div key={item.id} className="flex justify-between text-sm">
-                        <span>
-                          {item.quantity}x {item.fruit.name}
-                        </span>
-                        <span>{formatCurrency(item.subtotal)}</span>
-                      </div>
-                    ))}
-                    {order.orderItems.length > 3 && (
-                      <p className="text-sm text-gray-500">+{order.orderItems.length - 3} more items</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Payment Status */}
-                {order.payments.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium mb-2">Payment Status</p>
-                    <div className="space-y-1">
-                      {order.payments.map((payment) => (
-                        <div key={payment.id} className="flex justify-between text-sm">
-                          <span className="flex items-center space-x-2">
-                            <Badge
-                              variant="outline"
-                              className={
-                                payment.paymentStatus === "COMPLETED"
-                                  ? "border-green-500 text-green-700"
-                                  : payment.paymentStatus === "PENDING"
-                                    ? "border-yellow-500 text-yellow-700"
-                                    : "border-red-500 text-red-700"
-                              }
-                            >
-                              {payment.paymentStatus}
-                            </Badge>
-                            <span>{payment.paymentMethod}</span>
-                          </span>
-                          <span>{formatCurrency(payment.amountPaid)}</span>
-                        </div>
-                      ))}
+    <div className="rounded-md border bg-white">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Order Number</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Items</TableHead>
+            <TableHead>Total</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Payment</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((order) => (
+            <TableRow key={order.id} className="hover:bg-gray-50">
+              <TableCell className="font-medium">{order.orderNumber}</TableCell>
+              <TableCell>{order.customer.name}</TableCell>
+              <TableCell className="text-sm text-gray-500">{formatDate(order.createdAt)}</TableCell>
+              <TableCell>
+                <div className="text-sm">
+                  {order.orderItems.slice(0, 1).map((item) => (
+                    <div key={item.id} className="truncate max-w-[150px]">
+                      {item.quantity}x {item.fruit.name}
                     </div>
-                  </div>
-                )}
-
-                {/* Order Summary */}
-                <div className="flex justify-between items-center pt-3 border-t">
-                  <div className="text-sm text-gray-500">
-                    <p>Created by: {order.user?.name || "System"}</p>
-                    <p>Payments: {order._count.payments}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-500">Total</p>
-                    <p className="text-lg font-bold">{formatCurrency(order.total)}</p>
-                  </div>
+                  ))}
+                  {order.orderItems.length > 1 && (
+                    <span className="text-xs text-gray-500">+{order.orderItems.length - 1} more</span>
+                  )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      )}
+              </TableCell>
+              <TableCell className="font-medium">{formatCurrency(order.total)}</TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline" className={getPaymentColor(order.payment)}>
+                  {order.payment}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" disabled={updatingId === order.id}>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/dashboard/orders/${order.id}`}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Link>
+                    </DropdownMenuItem>
+
+                    {order.status === "PROCESSING" && (
+                      <>
+                        <DropdownMenuItem
+                          onClick={() => handleStatusUpdate(order.id, "COMPLETED")}
+                          disabled={updatingId === order.id}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Mark Completed
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleCancel(order.id)}
+                          disabled={updatingId === order.id}
+                          className="text-red-600"
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Cancel Order
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }

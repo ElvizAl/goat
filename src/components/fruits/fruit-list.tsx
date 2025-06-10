@@ -3,9 +3,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Eye, Edit, Trash2, Package, AlertTriangle } from "lucide-react"
 import { deleteFruit } from "@/actions/fruit-actions"
@@ -53,105 +53,122 @@ export function FruitList({ fruits, pagination }: FruitListProps) {
   }
 
   const getStockStatus = (stock: number) => {
-    if (stock === 0) return { label: "Out of Stock", color: "bg-red-100 text-red-800" }
-    if (stock <= 10) return { label: "Low Stock", color: "bg-yellow-100 text-yellow-800" }
-    return { label: "In Stock", color: "bg-green-100 text-green-800" }
+    if (stock === 0) return { label: "Out of Stock", color: "destructive" }
+    if (stock <= 10) return { label: "Low Stock", color: "secondary" }
+    return { label: "In Stock", color: "default" }
+  }
+
+  if (fruits.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+        <p className="text-gray-500">No fruits found</p>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {fruits.map((fruit) => {
-          const stockStatus = getStockStatus(fruit.stock)
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-16">Image</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Orders</TableHead>
+              <TableHead>Added</TableHead>
+              <TableHead className="w-16">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {fruits.map((fruit) => {
+              const stockStatus = getStockStatus(fruit.stock)
 
-          return (
-            <Card key={fruit.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+              return (
+                <TableRow key={fruit.id} className="hover:bg-gray-50">
+                  <TableCell>
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-100">
                       {fruit.image ? (
                         <Image src={fruit.image || "/placeholder.svg"} alt={fruit.name} fill className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package className="h-6 w-6 text-gray-400" />
+                          <Package className="h-5 w-5 text-gray-400" />
                         </div>
                       )}
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{fruit.name}</CardTitle>
-                      <Badge className={stockStatus.color}>{stockStatus.label}</Badge>
-                    </div>
-                  </div>
+                  </TableCell>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/fruits/${fruit.id}`}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/fruits/${fruit.id}/edit`}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(fruit.id)}
-                        disabled={deletingId === fruit.id}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardHeader>
+                  <TableCell>
+                    <div className="font-medium">{fruit.name}</div>
+                  </TableCell>
 
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-500">Price</p>
-                    <p className="font-semibold">Rp {fruit.price.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Stock</p>
-                    <p className="font-semibold flex items-center">
-                      {fruit.stock}
+                  <TableCell>
+                    <div className="font-semibold">Rp {fruit.price.toLocaleString("id-ID")}</div>
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="flex items-center">
+                      <span className="font-semibold">{fruit.stock}</span>
                       {fruit.stock <= 10 && fruit.stock > 0 && (
-                        <AlertTriangle className="h-3 w-3 ml-1 text-yellow-600" />
+                        <AlertTriangle className="h-4 w-4 ml-1 text-yellow-600" />
                       )}
-                    </p>
-                  </div>
-                </div>
+                    </div>
+                  </TableCell>
 
-                <div className="grid grid-cols-2 gap-4 pt-3 border-t">
-                  <div>
-                    <p className="text-xs text-gray-500">Orders</p>
-                    <p className="font-semibold">{fruit._count.orderItems}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Stock Changes</p>
-                    <p className="font-semibold">{fruit._count.stockHistory}</p>
-                  </div>
-                </div>
+                  <TableCell>
+                    <Badge variant={stockStatus.color as any}>{stockStatus.label}</Badge>
+                  </TableCell>
 
-                <div className="pt-2">
-                  <p className="text-xs text-gray-500">Added</p>
-                  <p className="text-sm">{new Date(fruit.createdAt).toLocaleDateString()}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+                  <TableCell>
+                    <div className="text-sm">
+                      <div>{fruit._count.orderItems} orders</div>
+                      <div className="text-gray-500">{fruit._count.stockHistory} changes</div>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="text-sm text-gray-500">{new Date(fruit.createdAt).toLocaleDateString("id-ID")}</div>
+                  </TableCell>
+
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/buah/${fruit.id}`}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/buah/${fruit.id}/edit`}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(fruit.id)}
+                          disabled={deletingId === fruit.id}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          {deletingId === fruit.id ? "Deleting..." : "Delete"}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination */}

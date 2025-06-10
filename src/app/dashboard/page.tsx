@@ -1,64 +1,36 @@
-import { DollarSign, Package, ShoppingCart, Users } from "lucide-react"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Overview } from "@/components/dashboard/overview"
+import { Suspense } from "react"
+import { requireAuth } from "@/actions/user-actions"
+import { getPaymentSummary } from "@/actions/payment-actions"
+import { getOrderSummary } from "@/actions/order-actions"
+import { getCustomerSummary } from "@/actions/customer-actions"
+import { AnalyticsOverview } from "@/components/analytics/analytics-overview"
+import { SalesChart } from "@/components/analytics/sales-chart"
+import { TopProducts } from "@/components/analytics/top-products"
+import { RecentActivity } from "@/components/analytics/recent-activity"
 
-export default function DashboardPage() {
+export default async function AnalyticsPage() {
+  await requireAuth()
+
+  const [paymentSummary, orderSummary, customerSummary] = await Promise.all([
+    getPaymentSummary(),
+    getOrderSummary(),
+    getCustomerSummary(),
+  ])
+
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <div className="flex items-center space-x-2">
-          <Link
-            href="/dashboard/inventory/add"
-            className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-          >
-            Tambah Buah
-          </Link>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+        <p className="text-muted-foreground">Analisis performa bisnis Anda</p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Pendapatan</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Rp 15.750.000</div>
-            <p className="text-xs text-muted-foreground">+20.1% dari bulan lalu</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pesanan</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">+12.5% dari bulan lalu</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Stok Buah</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">28 Jenis</div>
-            <p className="text-xs text-muted-foreground">+4 jenis dari bulan lalu</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pelanggan Aktif</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">+18.1% dari bulan lalu</p>
-          </CardContent>
-        </Card>
-      </div>
+
+      <Suspense fallback={<div>Loading overview...</div>}>
+        <AnalyticsOverview
+          paymentSummary={paymentSummary.success ? paymentSummary.data : null}
+          orderSummary={orderSummary.success ? orderSummary.data : null}
+          customerSummary={customerSummary.success ? customerSummary.data : null}
+        />
+      </Suspense>
     </div>
   )
 }

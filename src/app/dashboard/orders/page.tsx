@@ -14,13 +14,33 @@ interface PageProps {
     sortBy?: string
     sortOrder?: string
     page?: string
+    query?: string
   }>
 }
 
 export default async function OrdersPage({ searchParams }: PageProps) {
   await requireAuth()
 
-  const ordersResult = await getOrders()
+  // Await searchParams before accessing properties
+  const params = await searchParams
+
+  // Extract search parameters
+  const query = params.query || ""
+  const status = params.status || ""
+  const payment = params.payment || ""
+  const sortBy = params.sortBy || "createdAt"
+  const sortOrder = params.sortOrder || "desc"
+  const page = params.page ? Number.parseInt(params.page) : 1
+
+  // Get orders with search parameters
+  const ordersResult = await getOrders({
+    query,
+    status,
+    payment,
+    sortBy,
+    sortOrder,
+    page,
+  })
 
   return (
     <div className="container mx-auto p-6">
@@ -47,7 +67,16 @@ export default async function OrdersPage({ searchParams }: PageProps) {
 
         <div className="lg:col-span-3">
           {ordersResult.success ? (
-            <OrderList orders={ordersResult.data} />
+            <>
+              {query && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    Showing results for: <span className="font-medium">"{query}"</span>
+                  </p>
+                </div>
+              )}
+              <OrderList orders={ordersResult.data} />
+            </>
           ) : (
             <div className="text-center py-8">
               <p className="text-red-600">{ordersResult.error}</p>

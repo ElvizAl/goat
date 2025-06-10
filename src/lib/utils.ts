@@ -15,3 +15,11 @@ export function formatDate(dateInput: string | Date): string {
     minute: "2-digit",
   }).format(date)
 }
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(amount)
+}
