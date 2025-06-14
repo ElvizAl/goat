@@ -9,15 +9,18 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function CustomerDetailPage({ params }: PageProps) {
   await requireAuth()
 
-  const customerResult = await getCustomerById(params.id)
+  // Await the params Promise
+  const { id } = await params
+
+  const customerResult = await getCustomerById(id)
 
   if (!customerResult.success) {
     notFound()
@@ -28,12 +31,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
   const sanitizedCustomer = {
     ...customer,
     favoriteProducts: customer.favoriteProducts
-      .filter(
-        (p) =>
-          typeof p.name === "string" &&
-          p.name.trim() !== "" &&
-          "totalQuantity" in p
-      )
+      .filter((p) => typeof p.name === "string" && p.name.trim() !== "" && "totalQuantity" in p)
       .map((p) => ({
         name: p.name!,
         image: p.image ?? null,
