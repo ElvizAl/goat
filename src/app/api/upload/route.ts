@@ -13,7 +13,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return {
           allowedContentTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
           tokenPayload: JSON.stringify({
-            // Optional: Add any metadata you want to store
+            // Optional: Add any metadata you want too store
           }),
         }
       },
