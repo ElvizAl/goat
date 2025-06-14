@@ -7,15 +7,18 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function OrderDetailPage({ params }: PageProps) {
   await requireAuth()
 
-  const orderResult = await getOrderById(params.id)
+  // Await the params Promise
+  const { id } = await params
+
+  const orderResult = await getOrderById(id)
 
   if (!orderResult.success) {
     notFound()
